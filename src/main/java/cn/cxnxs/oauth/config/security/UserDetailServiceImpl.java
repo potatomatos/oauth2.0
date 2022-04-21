@@ -30,16 +30,37 @@ public class UserDetailServiceImpl implements UserDetailsService {
         if (StringUtils.isEmpty(username)) {
             return null;
         }
+        //从数据库获取权限
         SysUsers oauthUsers = sysUsersMapper.selectOne(new LambdaQueryWrapper<SysUsers>().eq(SysUsers::getUsername, username));
         if (oauthUsers==null){
             //表示用户不存在
-            return null;
+            throw  new UsernameNotFoundException("用户名或密码错误");
         }
-        //取出正确密码（hash值）
+        //取出正确密码（密文）
         String password = oauthUsers.getEncryptedPassword();
-        //从数据库获取权限
+        boolean enabled=true;
+        boolean accountNonExpired=true;
+        boolean credentialsNonExpired=true;
+        boolean accountNonLocked=true;
+
+        if (JwtUser.USER_STATE.DISABLED.getCode().equals(oauthUsers.getState())){
+            enabled=false;
+        }
+        if (JwtUser.USER_STATE.ACCOUNT_EXPIRED.getCode().equals(oauthUsers.getState())){
+            accountNonExpired=false;
+        }
+        if (JwtUser.USER_STATE.CREDENTIALS_EXPIRED.getCode().equals(oauthUsers.getState())){
+            credentialsNonExpired=false;
+        }
+        if (JwtUser.USER_STATE.ACCOUNT_LOCKED.getCode().equals(oauthUsers.getState())){
+            accountNonLocked=false;
+        }
         JwtUser userDetails = new JwtUser(username,
                 password,
+                enabled,
+                accountNonExpired,
+                credentialsNonExpired,
+                accountNonLocked,
                 AuthorityUtils.commaSeparatedStringToAuthorityList(""));
         userDetails.setId(oauthUsers.getId());
         userDetails.setUsername(oauthUsers.getUsername());

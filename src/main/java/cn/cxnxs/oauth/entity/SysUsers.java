@@ -72,7 +72,7 @@ public class SysUsers extends Model<SysUsers> {
 
     private String unconfirmedEmail;
 
-    private Short state;
+    private Integer state;
 
     /**
      * 所属客户端

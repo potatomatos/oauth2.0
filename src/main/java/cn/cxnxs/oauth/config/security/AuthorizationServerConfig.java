@@ -23,6 +23,8 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
+import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
+import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
@@ -73,7 +75,17 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     }
 
     /**
+     * 授权码存储方式，其实这个也可以不写，因为用的是密码模式，没有授权码
+     */
+    @Bean
+    public AuthorizationCodeServices authorizationCodeServices(DataSource dataSource) {
+        return new JdbcAuthorizationCodeServices(dataSource);
+    }
+
+
+    /**
      * 生成jwt令牌
+     *
      * @return
      */
     @Bean
@@ -91,7 +103,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 // 得到用户名，去处理数据库可以拿到当前用户的信息和角色信息（需要传递到服务中用到的信息）
                 UserDetails userDetails = userService.loadUserByUsername(username);
                 JwtUser jwtUser = (JwtUser) userDetails;
-                final HashMap additionalInformation= JSONObject.parseObject(JSON.toJSONString(jwtUser), HashMap.class);
+                final HashMap additionalInformation = JSONObject.parseObject(JSON.toJSONString(jwtUser), HashMap.class);
                 ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInformation);
                 return super.enhance(accessToken, authentication);
             }
@@ -113,6 +125,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         endpoints.accessTokenConverter(this.jwtAccessTokenConverter())
                 //使用密码模式需要配置
                 .authenticationManager(this.authenticationManager)
+                //配置授权码存储方式
+                .authorizationCodeServices(this.authorizationCodeServices(this.dataSource))
                 //指定token存储到redis，还有数据库、内存、jwt等存储方式！
                 .tokenStore(jdbcTokenStore())
                 //支持refresh_token机制
@@ -120,7 +134,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 //这一步包含账号、密码的检查！
                 .userDetailsService(userService)
                 //支持GET,POST请求
-                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
+                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST)
+                //获取token时用户名错误的处理
+                .exceptionTranslator(new WebResponseTranslator());
     }
 
     /**
@@ -137,7 +153,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 // 开启/oauth/token_key验证端口无权限访问
                 .tokenKeyAccess("permitAll()")
                 // 开启/oauth/check_token验证端口认证权限访问
-                .checkTokenAccess("isAuthenticated()");
+                .checkTokenAccess("permitAll()");
     }
 
     @Override

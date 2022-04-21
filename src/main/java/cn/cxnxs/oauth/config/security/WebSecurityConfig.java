@@ -1,5 +1,6 @@
 package cn.cxnxs.oauth.config.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +21,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private SuccessHandler successHandler;
+
+    @Autowired
+    private FailureHandler failureHandler;
+
+    @Autowired
+    private LogoutHandler logoutHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -49,13 +59,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.requestMatchers()
-                .antMatchers("/login","/oauth/**")
+                .antMatchers("/login","/oauth/**","swagger-ui.html","/webjars/**")
                 .and()
                 .authorizeRequests()
                 .anyRequest()
                 .authenticated()
                 .and()
                 .formLogin().permitAll()
+                .successHandler(successHandler).permitAll()
+                .failureHandler(failureHandler).permitAll()
+                .and().logout().logoutSuccessHandler(logoutHandler)
                 .and()
                 .httpBasic()
                 .and()
