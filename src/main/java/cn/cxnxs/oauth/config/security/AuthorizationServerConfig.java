@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -28,9 +29,11 @@ import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeSe
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
+import java.security.KeyPair;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -55,9 +58,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Autowired
     private UserDetailsService userService;
-
-    @Autowired
-    private JwtProperties jwtProperties;
 
 
     /**
@@ -109,10 +109,15 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
             }
         };
         // 生成签名的key,资源服务使用相同的字符达到一个对称加密的效果,生产时候使用RSA非对称加密方式
-        accessTokenConverter.setSigningKey(jwtProperties.getSigningKey());
+        accessTokenConverter.setKeyPair(keyPair());
         return accessTokenConverter;
     }
 
+    @Bean
+    public KeyPair keyPair() {
+        KeyStoreKeyFactory factory = new KeyStoreKeyFactory(new ClassPathResource("jwt.jks"), "123456".toCharArray());
+        return factory.getKeyPair("jwt", "123456".toCharArray());
+    }
 
     /**
      * 授权服务器端点配置
