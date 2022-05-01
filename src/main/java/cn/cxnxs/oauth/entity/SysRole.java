@@ -34,6 +34,11 @@ public class SysRole extends Model<SysRole> {
     private String roleCode;
 
     /**
+     * 所属应用
+     */
+    private Integer clientId;
+
+    /**
      * 描述
      */
     private String description;

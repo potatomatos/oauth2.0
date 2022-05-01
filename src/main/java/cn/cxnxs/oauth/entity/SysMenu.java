@@ -35,6 +35,11 @@ public class SysMenu extends Model<SysMenu> {
     private Integer parentId;
 
     /**
+     * 所属应用
+     */
+    private Integer clientId;
+
+    /**
      * 菜单标题
      */
     private String menuName;

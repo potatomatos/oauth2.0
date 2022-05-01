@@ -42,6 +42,16 @@ public class SysPermission extends Model<SysPermission> {
     private String code;
 
     /**
+     * 所属菜单
+     */
+    private Integer menuId;
+
+    /**
+     * 所属应用
+     */
+    private Integer clientId;
+
+    /**
      * 状态：0启用，1禁用
      */
     private Integer state;
