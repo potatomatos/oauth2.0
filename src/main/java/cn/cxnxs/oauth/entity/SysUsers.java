@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author mengjinyuan
- * @since 2022-04-13
+ * @since 2022-05-01
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -72,12 +72,10 @@ public class SysUsers extends Model<SysUsers> {
 
     private String unconfirmedEmail;
 
-    private Integer state;
-
     /**
-     * 所属客户端
+     * 0-启用 1-停用 2-账号过期 3-认证过期 4-账号锁定
      */
-    private Integer clientId;
+    private Boolean state;
 
     private LocalDateTime createdAt;
 

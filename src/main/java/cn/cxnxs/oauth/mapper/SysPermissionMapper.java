@@ -1,16 +1,16 @@
 package cn.cxnxs.oauth.mapper;
 
-import cn.cxnxs.oauth.entity.SysUsers;
+import cn.cxnxs.oauth.entity.SysPermission;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * <p>
- * 用户信息 Mapper 接口
+ * 权限表 Mapper 接口
  * </p>
  *
  * @author mengjinyuan
  * @since 2022-05-01
  */
-public interface SysUsersMapper extends BaseMapper<SysUsers> {
+public interface SysPermissionMapper extends BaseMapper<SysPermission> {
 
 }
