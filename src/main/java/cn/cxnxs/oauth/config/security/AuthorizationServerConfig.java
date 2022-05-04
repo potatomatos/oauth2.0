@@ -1,17 +1,12 @@
 package cn.cxnxs.oauth.config.security;
 
 import cn.cxnxs.oauth.config.security.entity.JwtUser;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
@@ -34,7 +29,6 @@ import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
 import java.security.KeyPair;
-import java.util.Collection;
 import java.util.HashMap;
 
 /**
@@ -97,13 +91,10 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
              */
             @Override
             public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
-                Authentication user = authentication.getUserAuthentication();
-                String username = user.getName();
-                Collection<? extends GrantedAuthority> authority = user.getAuthorities();
-                // 得到用户名，去处理数据库可以拿到当前用户的信息和角色信息（需要传递到服务中用到的信息）
-                UserDetails userDetails = userService.loadUserByUsername(username);
-                JwtUser jwtUser = (JwtUser) userDetails;
-                final HashMap additionalInformation = JSONObject.parseObject(JSON.toJSONString(jwtUser), HashMap.class);
+                JwtUser jwtUser= (JwtUser) authentication.getPrincipal();
+                HashMap<String,Object> additionalInformation = new HashMap<>();
+                //把用户ID设置到JWT中
+                additionalInformation.put("userId",jwtUser.getId());
                 ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInformation);
                 return super.enhance(accessToken, authentication);
             }
@@ -139,9 +130,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 //这一步包含账号、密码的检查！
                 .userDetailsService(userService)
                 //支持GET,POST请求
-                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST)
-                //获取token时用户名错误的处理
-                .exceptionTranslator(new WebResponseTranslator());
+                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
     }
 
     /**
@@ -158,7 +147,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 // 开启/oauth/token_key验证端口无权限访问
                 .tokenKeyAccess("permitAll()")
                 // 开启/oauth/check_token验证端口认证权限访问
-                .checkTokenAccess("permitAll()");
+                .checkTokenAccess("isAuthenticated()");
     }
 
     @Override
