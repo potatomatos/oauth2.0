@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author mengjinyuan
@@ -37,7 +37,7 @@ public class SysUserClient extends Model<SysUserClient> {
     /**
      * 客户端id
      */
-    private Integer clientId;
+    private String clientId;
 
     /**
      * 创建时间戳

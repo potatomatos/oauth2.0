@@ -49,7 +49,7 @@ public class SysPermission extends Model<SysPermission> {
     /**
      * 所属应用
      */
-    private Integer clientId;
+    private String clientId;
 
     /**
      * 状态：0启用，1禁用
@@ -70,6 +70,11 @@ public class SysPermission extends Model<SysPermission> {
      * 更新时间
      */
     private Long updateAt;
+
+    /**
+     * 权限类型：0常规，1白名单
+     */
+    private Integer permissionType;
 
 
     @Override

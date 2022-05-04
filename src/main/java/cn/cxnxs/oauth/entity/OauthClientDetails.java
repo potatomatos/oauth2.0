@@ -1,5 +1,6 @@
 package cn.cxnxs.oauth.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import java.io.Serializable;
 import lombok.Data;
@@ -8,7 +9,7 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author mengjinyuan
@@ -21,6 +22,7 @@ public class OauthClientDetails extends Model<OauthClientDetails> {
 
     private static final long serialVersionUID=1L;
 
+    @TableId
     private String clientId;
 
     private String resourceIds;

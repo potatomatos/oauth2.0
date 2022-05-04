@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author mengjinyuan
@@ -36,7 +36,7 @@ public class SysRole extends Model<SysRole> {
     /**
      * 所属应用
      */
-    private Integer clientId;
+    private String clientId;
 
     /**
      * 描述

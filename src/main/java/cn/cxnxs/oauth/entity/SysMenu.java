@@ -37,7 +37,7 @@ public class SysMenu extends Model<SysMenu> {
     /**
      * 所属应用
      */
-    private Integer clientId;
+    private String clientId;
 
     /**
      * 菜单标题
