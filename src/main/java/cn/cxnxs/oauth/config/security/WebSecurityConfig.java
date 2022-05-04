@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -31,10 +32,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private LogoutHandler logoutHandler;
 
+    @Autowired
+    private DeniedHandler deniedHandler;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 
     /**
      * 用户信息
@@ -50,6 +55,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userService());
     }
 
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        //解决静态资源被拦截的问题
+        web.ignoring().antMatchers("/static/**");
+    }
+
     /**
      * 配置访问策略
      *
@@ -60,14 +71,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/login","/rsa/publicKey","/oauth/**","swagger-ui.html","/webjars/**").permitAll()
+                .antMatchers("/static/**", "/sys/captcha", "/login", "/rsa/publicKey", "/oauth/**", "swagger-ui.html", "/webjars/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
-                .formLogin().permitAll()
+                .formLogin().loginPage("/sys/login.html").loginProcessingUrl("/sys/login").permitAll()
                 .successHandler(successHandler).permitAll()
                 .failureHandler(failureHandler).permitAll()
-                .and().logout().logoutSuccessHandler(logoutHandler)
+                .and()
+                .logout().logoutUrl("/logout").logoutSuccessHandler(logoutHandler)
+                .invalidateHttpSession(true).clearAuthentication(true)
+                .and()
+                //配置没有权限的自定义处理类
+                .exceptionHandling().accessDeniedHandler(deniedHandler)
                 .and()
                 .httpBasic();
     }
