@@ -4,6 +4,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>用户信息</p>
@@ -15,6 +17,10 @@ public class JwtUser extends User {
 
     private Integer id;
     private String username;
+    private List<String> userClients;
+    private List<String> userRoles;
+    private List<Map<String, String>> permissions;
+    private Map<String,List<Map<String, String>>> rolePermissions;
 
     public JwtUser(String username,
                    String password,
@@ -42,6 +48,38 @@ public class JwtUser extends User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public List<String> getUserClients() {
+        return userClients;
+    }
+
+    public void setUserClients(List<String> userClients) {
+        this.userClients = userClients;
+    }
+
+    public List<String> getUserRoles() {
+        return userRoles;
+    }
+
+    public void setUserRoles(List<String> userRoles) {
+        this.userRoles = userRoles;
+    }
+
+    public List<Map<String, String>> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<Map<String, String>> permissions) {
+        this.permissions = permissions;
+    }
+
+    public Map<String, List<Map<String, String>>> getRolePermissions() {
+        return rolePermissions;
+    }
+
+    public void setRolePermissions(Map<String, List<Map<String, String>>> rolePermissions) {
+        this.rolePermissions = rolePermissions;
     }
 
     /**
