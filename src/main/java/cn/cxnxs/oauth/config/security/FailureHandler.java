@@ -43,7 +43,7 @@ public class FailureHandler extends JSONAuthentication implements Authentication
             result = Result.failure(Result.ResultEnum.USER_ACCOUNT_NOT_EXIST,e.getMessage());
         }else{
             //其他错误
-            result = Result.failure(Result.ResultEnum.COMMON_FAIL,e.getMessage());
+            result = Result.failure(Result.ResultEnum.COMMON_FAIL,e.getMessage(),e.getMessage());
         }
         this.writeJSON(httpServletRequest,httpServletResponse,result);
     }

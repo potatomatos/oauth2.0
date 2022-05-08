@@ -17,6 +17,13 @@ public class JwtUser extends User {
 
     private Integer id;
     private String username;
+    /**
+     * 头像
+     */
+    private String avatar;
+    private String phoneNumber;
+    private String email;
+
     private List<String> userClients;
     private List<String> userRoles;
     private List<Map<String, String>> permissions;
@@ -80,6 +87,30 @@ public class JwtUser extends User {
 
     public void setRolePermissions(Map<String, List<Map<String, String>>> rolePermissions) {
         this.rolePermissions = rolePermissions;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     /**

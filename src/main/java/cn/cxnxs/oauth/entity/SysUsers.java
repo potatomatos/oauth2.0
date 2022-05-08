@@ -35,7 +35,6 @@ public class SysUsers extends Model<SysUsers> {
      */
     private String avatar;
 
-    @TableField("phoneNumber")
     private String phoneNumber;
 
     private String email;

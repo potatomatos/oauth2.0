@@ -38,7 +38,7 @@ $(function () {
      */
     $("#captchaPic").click(function () {
         var time = new Date().getTime();
-        $(this).attr('src', "/sys/captcha?time=" + time);
+        $(this).attr('src', "captcha?time=" + time);
     });
 
     /**
@@ -51,21 +51,22 @@ $(function () {
             .html('<i class="fa fa-spinner fa-spin"></i>');
         $(".err-tips").html('');
         $.ajax({
-            url: "/sys/login",
+            url: "/login",
             type:'post',
             data:{
                 username:$(".username").val(),
                 password:$(".password").val(),
-                captcha:$(".captcha").val()
+                captcha:$(".captcha").val(),
+                type:"PASSWORD",
+                clientId:getQueryString("clientId"),
+                redirectUri:getQueryString("redirectUri")
             },
             success: function (res) {
-                if (res.code===200){
+                if (res.code===0){
                     $('.login').html('登录成功');
-                    //保存用户信息
-                    localStorage.setItem("userInfo",JSON.stringify(res.data));
-                    localStorage.setItem("token",res.data.token);
                     setTimeout(function () {
-                        location="/#/bookmark";
+                        //跳转授权页面
+                        location=res.data;
                     },2000);
                 }else {
                     $('.login').attr("disabled",false)
@@ -82,4 +83,12 @@ $(function () {
         ev.preventDefault();
         return false;
     });
+    /*获取地址栏参数*/
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null)
+            return unescape(r[2]);
+        return null;
+    }
 });
